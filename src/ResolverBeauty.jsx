@@ -33,7 +33,6 @@ function Resolver() {
   }
 
   function getPossibleComponents() {
-    // Всегда парсим актуальные значения из инпутов
     const parsedFloats = parseNumbers();
     const parsedSingle = parseSingle();
 
@@ -51,7 +50,6 @@ function Resolver() {
         combos.push([...current]);
         return;
       }
-
       if (difference < 0) return;
 
       for (let i = index; i < nums.length; i++) {
@@ -68,17 +66,16 @@ function Resolver() {
 
     helper(parsedSingle, 0, []);
     setPossibleComponents(combos);
-    // console.log(JSON.stringify(combos, null, 2));
   }
 
-  // Для кнопки достаточно, чтобы поля не были пустыми
   const canResolve = text.trim() !== "" && single.trim() !== "";
 
   return (
-    <div className="min-h-screen w-screen bg-slate-900 text-slate-100 flex items-center justify-center">
-      {/* Центрированный контейнер ограниченной ширины */}
-      <div className="w-full max-w-6xl px-4 sm:px-6 lg:px-10 py-6 sm:py-10">
-        <div className="bg-slate-800 rounded-2xl shadow-xl p-6 md:p-8 space-y-8 flex flex-col">
+    <div className="h-max-9/12 w-full bg-slate-900 text-slate-100 flex">
+      {/* Почти фуллскрин: 96vw x 94dvh. Не шире 2xl, но если экран меньше — подстроится. */}
+      <div className="w-[96vw] max-w-screen-2xl h-[94dvh] p-3 sm:p-5">
+        {/* Карточка занимает всю доступную высоту и ширину, без выхода за экран */}
+        <div className="h-full w-full bg-slate-800 rounded-2xl shadow-xl p-5 sm:p-8 flex flex-col overflow-hidden">
           <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="text-center md:text-left">
               <h1 className="text-3xl lg:text-4xl font-semibold tracking-tight">
@@ -87,9 +84,7 @@ function Resolver() {
               <p className="text-sm text-slate-400">
                 Enter a list of numbers and a target value to find possible combinations.
               </p>
-              <p className="mt-3 px-4 py-1.5 inline-block rounded-md bg-red-950 text-red-100 text-sm font-semibold">
-                Если нет запятой, ничё работать НЕ БУДЕТ!!!
-              </p>
+            
             </div>
             <button
               onClick={getPossibleComponents}
@@ -105,19 +100,19 @@ function Resolver() {
             </button>
           </header>
 
-          {/* Основная часть */}
-          <div className="grid gap-6 md:grid-cols-2">
+          {/* Основной контент — получает доступное место и может сжиматься */}
+          <div className="grid gap-6 md:grid-cols-2 mt-6 min-h-0">
             {/* Multiline input */}
-            <div className="bg-slate-900/40 border border-slate-700 rounded-xl p-4 space-y-3">
+            <div className="bg-slate-900/40 border border-slate-700 rounded-xl p-4 space-y-3 min-h-0">
               <div className="flex items-center justify-between gap-2">
                 <h2 className="text-lg font-medium">Multiline numbers</h2>
               </div>
 
               <textarea
-                rows={6}
+                rows={8}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                className="w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-500 resize-none"
+                className="w-full max-w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-500 resize-y"
                 placeholder={`Type numbers, one per line, e.g.:
 34,5
 34,6
@@ -128,14 +123,14 @@ function Resolver() {
                 <p className="text-xs font-semibold text-slate-400 mb-1">
                   Parsed numbers:
                 </p>
-                <pre className="text-xs bg-slate-900/70 border border-slate-700 rounded-lg px-3 py-2 overflow-x-auto">
+                <pre className="text-xs bg-slate-900/70 border border-slate-700 rounded-lg px-3 py-2 overflow-x-auto break-words whitespace-pre-wrap">
                   {floats.length > 0 ? JSON.stringify(floats) : "No numbers parsed yet."}
                 </pre>
               </div>
             </div>
 
             {/* Single input */}
-            <div className="bg-slate-900/40 border border-slate-700 rounded-xl p-4 space-y-4">
+            <div className="bg-slate-900/40 border border-slate-700 rounded-xl p-4 space-y-4 min-h-0">
               <div className="flex items-center justify-between gap-2">
                 <h2 className="text-lg font-medium">Single number</h2>
               </div>
@@ -144,7 +139,7 @@ function Resolver() {
                 type="text"
                 value={single}
                 onChange={(e) => setSingle(e.target.value)}
-                className="w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-500"
+                className="w-full max-w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-500"
                 placeholder="Type one float like 34,5"
               />
 
@@ -162,8 +157,8 @@ function Resolver() {
             </div>
           </div>
 
-          {/* Results */}
-          <section className="bg-slate-900/40 border border-slate-700 rounded-xl p-4 space-y-4">
+          {/* Результаты — занимает весь остаток высоты карточки, скроллится внутри */}
+          <section className="bg-slate-900/40 border border-slate-700 rounded-xl p-4 space-y-4 mt-6 flex-1 min-h-0 overflow-hidden">
             <div className="flex items-center justify-between gap-2">
               <h2 className="text-lg font-medium">Results</h2>
               <span className="text-xs text-slate-400">
@@ -177,14 +172,16 @@ function Resolver() {
                 <span className="font-semibold text-emerald-400">Resolve combinations</span>.
               </p>
             ) : (
-              <div className="max-h-[50vh] overflow-y-auto space-y-2">
+              <div className="h-full overflow-y-auto space-y-2 pr-1">
                 {results.map((combo, index) => (
                   <div
                     key={index}
                     className="flex items-center justify-between text-sm bg-slate-900 border border-slate-700 rounded-lg px-3 py-2"
                   >
                     <span className="text-xs text-slate-400">#{index + 1}</span>
-                    <span className="font-mono text-slate-100">{combo.join(" + ")}</span>
+                    <span className="font-mono text-slate-100 break-words">
+                      {combo.join(" + ")}
+                    </span>
                   </div>
                 ))}
               </div>
